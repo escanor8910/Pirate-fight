@@ -25,28 +25,42 @@
         <div id="health-label">HP</div>
         <div id="health-bar-bg"><div id="health-bar"></div></div>
       </div>
-      <div id="score">Pirates defeated: <span id="kills">0</span></div>
+
+      <div id="center-hud">
+        <div id="treasure-status">Treasure: safe</div>
+        <div id="cannon-status">Cannon: 3:00</div>
+      </div>
+
+      <div id="team-status">
+        <div class="team-line"><span class="dot blue"></span>You: <span id="ally-count">5</span>/5</div>
+        <div class="team-line"><span class="dot red"></span>Foe: <span id="enemy-count">5</span>/5</div>
+      </div>
     </div>
 
     <div id="joystick-zone">
       <div id="joystick-base"><div id="joystick-stick"></div></div>
     </div>
 
-    <button id="attack-btn">ATTACK!</button>
+    <button id="action-btn">ATTACK!</button>
+    <button id="cannon-btn" class="hidden">FIRE CANNON!</button>
 
     <div id="start-screen" class="overlay">
       <h1>PIRATE FIGHT</h1>
-      <p class="subtitle">Defend your ship from enemy pirates!</p>
+      <p class="subtitle">5 vs 5 ship battle!</p>
       <div class="instructions">
-        <div>Move: Left joystick (or WASD)</div>
-        <div>Swing sword: ATTACK button (or Space)</div>
+        <div><b>Move:</b> Joystick / WASD</div>
+        <div><b>Attack:</b> ATTACK / Space</div>
+        <div><b>Carry:</b> Walk over fallen teammates or the treasure</div>
+        <div><b>Drop:</b> ATTACK button becomes DROP while carrying</div>
+        <div><b>Cannon:</b> Stand next to it when ready, then FIRE!</div>
+        <div class="hint">Stop the enemy from holding the treasure on their ship for 60s!</div>
       </div>
       <button id="start-btn">START</button>
     </div>
 
     <div id="game-over-screen" class="overlay hidden">
       <h1 id="game-over-title">YE BE DEFEATED!</h1>
-      <p>Pirates defeated: <span id="final-kills">0</span></p>
+      <p id="game-over-sub">The enemy sailed away with the treasure...</p>
       <button id="restart-btn">FIGHT AGAIN</button>
     </div>
   </div>

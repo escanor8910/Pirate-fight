@@ -463,6 +463,20 @@ function createPirate({ team, isPlayer = false, shirtTint = null }) {
   sword.position.set(0, -1.1, 0);
   armRPivot.add(sword);
 
+  // Dizzy stars that appear above a knocked-out pirate (added to scene, not the pirate)
+  const koIndicator = new THREE.Group();
+  for (let i = 0; i < 4; i++) {
+    const star = new THREE.Mesh(
+      new THREE.OctahedronGeometry(0.32),
+      new THREE.MeshStandardMaterial({ color: 0xffd54f, emissive: 0xffaa00, emissiveIntensity: 0.9, flatShading: true })
+    );
+    const a = (i / 4) * Math.PI * 2;
+    star.position.set(Math.cos(a) * 0.85, Math.sin(a * 2) * 0.15, Math.sin(a) * 0.85);
+    koIndicator.add(star);
+  }
+  koIndicator.visible = false;
+  scene.add(koIndicator);
+
   group.userData = {
     team,
     isPlayer,
@@ -478,7 +492,7 @@ function createPirate({ team, isPlayer = false, shirtTint = null }) {
     flashTimer: 0,
     fallTimer: 0,
     aiThink: Math.random() * 0.5,
-    body, head, armLPivot, armRPivot, legL, legR, sword, marker,
+    body, head, armLPivot, armRPivot, legL, legR, sword, marker, koIndicator,
   };
   return group;
 }
@@ -520,7 +534,10 @@ function spawnTeam() {
 }
 
 function clearTeam() {
-  for (const p of allPirates) scene.remove(p);
+  for (const p of allPirates) {
+    scene.remove(p);
+    if (p.userData.koIndicator) scene.remove(p.userData.koIndicator);
+  }
   allPirates.length = 0;
   player = null;
 }
@@ -667,6 +684,7 @@ function animatePirate(p, dt, isMoving) {
     // Lie on the ground, rotated forward
     p.rotation.x = -Math.PI / 2;
     p.position.y = 0.5;
+    ud.body.material.emissive.setHex(0x000000);
     return;
   } else {
     p.rotation.x = 0;
@@ -716,10 +734,10 @@ function animatePirate(p, dt, isMoving) {
 
 function inSwordArc(attacker, target) {
   const d = distance(attacker, target);
-  if (d > 2.6) return false;
+  if (d > 3.1) return false;
   const forward = tmp.set(0, 0, 1).applyQuaternion(attacker.quaternion);
   const toTarget = tmp2.subVectors(target.position, attacker.position).normalize();
-  return forward.dot(toTarget) > 0.2;
+  return forward.dot(toTarget) > -0.05;
 }
 
 function knockOut(pirate) {
@@ -1163,6 +1181,20 @@ function updateCarriedItems() {
   }
 }
 
+// Spinning dizzy stars above any knocked-out pirate
+function updateKOIndicators(dt) {
+  for (const p of allPirates) {
+    const ko = p.userData.koIndicator;
+    if (!ko) continue;
+    const down = p.userData.state === 'fallen' || p.userData.state === 'being_carried';
+    ko.visible = down;
+    if (down) {
+      ko.position.set(p.position.x, p.position.y + 2.4, p.position.z);
+      ko.rotation.y += dt * 5;
+    }
+  }
+}
+
 // =========================================================================
 // GAME STATE UPDATE
 // =========================================================================
@@ -1260,6 +1292,7 @@ function frame() {
       updateAI(p, dt);
     }
     updateCarriedItems();
+    updateKOIndicators(dt);
     updateCannonball(dt);
     updateGameState(dt);
   }

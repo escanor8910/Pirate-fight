@@ -322,7 +322,7 @@ scene.add(cannonGroup);
 // Cannonball (created fresh each shot)
 let cannonball = null;
 
-const CANNON_RECHARGE = 180;  // 3 minutes
+const CANNON_RECHARGE = 40;  // ready in 40 seconds, then recharges
 const cannon = {
   cooldown: CANNON_RECHARGE,
   ready: false,
@@ -469,9 +469,9 @@ function createPirate({ team, isPlayer = false, shirtTint = null }) {
     state: 'idle',                 // idle | fallen | being_carried
     carrying: null,                // a pirate (fallen) or 'treasure'
     carriedBy: null,
-    health: isPlayer ? 100 : 60,
-    maxHealth: isPlayer ? 100 : 60,
-    speed: isPlayer ? 6.5 : 4.0,
+    health: isPlayer ? 120 : 40,
+    maxHealth: isPlayer ? 120 : 40,
+    speed: isPlayer ? 6.8 : 3.4,
     walkPhase: Math.random() * Math.PI * 2,
     swingTimer: 0,
     attackCooldown: 0,
@@ -773,7 +773,8 @@ function attackSwing(pirate) {
     if (other.userData.team === ud.team) continue;
     if (other.userData.state === 'fallen') continue;
     if (inSwordArc(pirate, other)) {
-      damagePirate(other, ud.isPlayer ? 25 : 14);
+      const dmg = ud.isPlayer ? 40 : (ud.team === 'player' ? 20 : 8);
+      damagePirate(other, dmg);
       // Knockback
       tmp.subVectors(other.position, pirate.position).setY(0).normalize().multiplyScalar(0.4);
       tryMove(other, tmp.x, tmp.z);
